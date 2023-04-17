@@ -7,7 +7,7 @@ const validateBody = (schema, statusCode, errorMessage) => {
     if (!isEmptyReqBody) {
       next(HttpError(400, "missing fields"));
     }
-    console.log(isEmptyReqBody);
+    console.log("isEmpty", isEmptyReqBody);
     if (error) {
       next(
         HttpError(

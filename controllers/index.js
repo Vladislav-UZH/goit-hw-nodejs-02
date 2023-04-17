@@ -9,6 +9,7 @@ const removeById = require("./contacts/removeById");
 
 const updateById = require("./contacts/updateById");
 
+const updateStatus = require("./contacts/updateStatus");
 //
 
 module.exports = {
@@ -17,4 +18,5 @@ module.exports = {
   add: ctrlWrapper(add),
   removeById: ctrlWrapper(removeById),
   updateById: ctrlWrapper(updateById),
+  updateStatus: ctrlWrapper(updateStatus),
 };

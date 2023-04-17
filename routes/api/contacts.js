@@ -5,11 +5,13 @@ const {
   add,
   removeById,
   updateById,
+  updateStatus,
 } = require("../../controllers/index");
 const validateBody = require("../../middlewares/validateBody");
 const {
   addingSchema,
   updatingSchema,
+  updatingStatusSchema,
 } = require("../../schemas/contactsSchema");
 const router = express.Router();
 
@@ -27,4 +29,9 @@ router.put(
   updateById
 );
 
+router.patch(
+  "/:contactId/favorite",
+  validateBody(updatingStatusSchema, 400, "missing field favorite"),
+  updateStatus
+);
 module.exports = router;
