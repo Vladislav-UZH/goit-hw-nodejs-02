@@ -1,26 +1,36 @@
 // const HttpError = require("../helpers/HttpError");
 const Contact = require("../db/models/contactModel");
 const listContacts = async () => {
-  return Contact.find();
+  const contacts = await Contact.find;
+  return contacts;
 };
 
 const getContactById = async (contactId) => {
-  return Contact.findOne({ _id: contactId });
+  const contact = await Contact.findOne({ _id: contactId });
+  return contact;
 };
 
 const removeContact = async (contactId) => {
-  return Contact.findByIdAndRemove({ _id: contactId });
+  const contact = await Contact.findByIdAndRemove({ _id: contactId });
+  return contact;
 };
 
 const addContact = async (body) => {
-  return Contact.create(body);
+  const contact = await Contact.create(body);
+  return contact;
 };
 
 const updateContact = async (contactId, body) => {
-  return Contact.findByIdAndUpdate({ _id: contactId }, body, { new: true });
+  const contact = await Contact.findByIdAndUpdate({ _id: contactId }, body, {
+    new: true,
+  });
+  return contact;
 };
 const updateStatusContact = async (contactId, body) => {
-  return Contact.findByIdAndUpdate({ _id: contactId }, body, { new: true });
+  const contact = await Contact.findByIdAndUpdate({ _id: contactId }, body, {
+    new: true,
+  });
+  return contact;
 };
 module.exports = {
   listContacts,
