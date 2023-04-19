@@ -5,7 +5,7 @@ const updateStatus = async (req, res) => {
   if (!contact) {
     throw HttpError(404, "Not Found");
   }
-  res.status(200).json({ data: contact });
+  res.status(200).json(contact);
 };
 
 module.exports = updateStatus;

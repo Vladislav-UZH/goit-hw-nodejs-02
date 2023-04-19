@@ -7,7 +7,7 @@ const contactSchema = new Schema(
     phone: { type: String, required: true },
     favorite: { type: Boolean, default: false },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false, timestamps: false }
 );
 
 const Contact = model("contact", contactSchema);

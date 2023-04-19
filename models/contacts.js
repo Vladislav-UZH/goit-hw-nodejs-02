@@ -1,7 +1,7 @@
 // const HttpError = require("../helpers/HttpError");
 const Contact = require("../db/models/contactModel");
 const listContacts = async () => {
-  const contacts = await Contact.find;
+  const contacts = await Contact.find();
   return contacts;
 };
 
