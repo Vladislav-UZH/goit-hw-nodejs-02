@@ -1,8 +1,20 @@
 // const HttpError = require("../helpers/HttpError");
 const Contact = require("../db/models/contactModel");
-const listContacts = async () => {
-  const contacts = await Contact.find();
-  return contacts;
+const listContacts = async (
+  owner,
+  { page = 1, limit = 10, favorite = "all" }
+) => {
+  const skip = (page - 1) * limit;
+  console.log(favorite);
+  if (favorite === "all") {
+    const contacts = await Contact.find({ owner }, "", { skip, limit });
+    return contacts;
+  }
+  const filteredContacts = await Contact.find({ owner, favorite }, "", {
+    skip,
+    limit,
+  });
+  return filteredContacts;
 };
 
 const getContactById = async (contactId) => {

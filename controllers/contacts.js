@@ -5,16 +5,18 @@ const {
   removeContact,
   updateContact,
   updateStatusContact,
-} = require("../../models/contacts");
-const { HttpError } = require("../../helpers");
+} = require("../service/contacts");
+const { HttpError } = require("../helpers");
 //
 const add = async (req, res) => {
-  const result = await addContact(req.body);
+  const { id } = req.user;
+  const result = await addContact({ ...req.body, owner: id });
   res.status(201).json(result);
 };
 //
-const getList = async (__, res) => {
-  const result = await listContacts();
+const getList = async (req, res) => {
+  const { id } = req.user;
+  const result = await listContacts(id, req.query);
   if (!result) {
     throw HttpError(404, "Contacts not found");
   }
