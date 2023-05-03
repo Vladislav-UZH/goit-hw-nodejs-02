@@ -6,7 +6,7 @@ const { userSchemas, SUBSCRIPTION_OPTIONS } = require("../../schemas/schemas");
 const router = express.Router();
 //
 router.post(
-  "/registration",
+  "/register",
   validateBody(userSchemas.registerSchema),
   ctrl.register
 );
