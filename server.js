@@ -1,5 +1,4 @@
 const app = require("./app");
-require("dotenv").config();
 
 const db = require("./db/connection");
 const startServer = async () => {

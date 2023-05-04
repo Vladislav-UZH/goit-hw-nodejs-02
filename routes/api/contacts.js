@@ -9,32 +9,41 @@ const {
 } = require("../../controllers/index");
 const isValidId = require("../../middlewares/isValidId");
 const validateBody = require("../../middlewares/validateBody");
-const {
-  addingSchema,
-  updatingSchema,
-  updatingStatusSchema,
-} = require("../../schemas/contactsSchema");
+const authenticate = require("../../middlewares/authenticate");
+
+const { contactsSchemas } = require("../../schemas/schemas");
 const router = express.Router();
 
-router.get("/", getList);
+router.get("/", authenticate, getList);
 
-router.get("/:contactId", isValidId, getById);
+router.get("/:contactId", authenticate, isValidId, getById);
 
-router.post("/", validateBody(addingSchema, 400), add);
+router.post(
+  "/",
+  authenticate,
+  validateBody(contactsSchemas.addingSchema, 400),
+  add
+);
 
-router.delete("/:contactId", isValidId, removeById);
+router.delete("/:contactId", authenticate, isValidId, removeById);
 
 router.put(
   "/:contactId",
   isValidId,
-  validateBody(updatingSchema, 400, "missing fields"),
+  authenticate,
+  validateBody(contactsSchemas.updatingSchema, 400, "missing fields"),
   updateById
 );
 
 router.patch(
   "/:contactId/favorite",
   isValidId,
-  validateBody(updatingStatusSchema, 400, "missing field favorite"),
+  authenticate,
+  validateBody(
+    contactsSchemas.updatingStatusSchema,
+    400,
+    "missing field favorite"
+  ),
   updateStatus
 );
 module.exports = router;
