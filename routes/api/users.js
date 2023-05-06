@@ -1,6 +1,7 @@
 const express = require("express");
 const ctrl = require("../../controllers");
 const authenticate = require("../../middlewares/authenticate");
+const upload = require("../../middlewares/upload");
 const validateBody = require("../../middlewares/validateBody");
 const { userSchemas, SUBSCRIPTION_OPTIONS } = require("../../schemas/schemas");
 const router = express.Router();
@@ -22,6 +23,12 @@ router.patch(
     `"subscription" must be one of [${SUBSCRIPTION_OPTIONS}]`
   ),
   ctrl.updateSubscription
+);
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  ctrl.updateAvatar
 );
 
 module.exports = router;
