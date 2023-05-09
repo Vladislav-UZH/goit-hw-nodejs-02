@@ -74,14 +74,18 @@ const updateSubscriptionUser = async (id, { subscription }) => {
 };
 // --UPDATE USER AVATAR--
 const updateAvatarUser = async (id, { path: tempUpload, originalname }) => {
-  await resizer(tempUpload);
-  const filename = `${id}_${originalname}`;
-  const resultUpload = path.join(avatarsDir, filename);
-  //
-  await fs.rename(tempUpload, resultUpload);
-  const avatarURL = path.join("avatars", filename);
-  await User.findByIdAndUpdate(id, { avatarURL });
-  return avatarURL;
+  try {
+    await resizer(tempUpload);
+    const filename = `${id}_${originalname}`;
+    const resultUpload = path.join(avatarsDir, filename);
+    //
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("avatars", filename);
+    await User.findByIdAndUpdate(id, { avatarURL });
+    return avatarURL;
+  } catch (error) {
+    await fs.unlink(tempUpload);
+  }
 };
 module.exports = {
   loginUser,
