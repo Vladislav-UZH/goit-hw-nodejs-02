@@ -5,6 +5,7 @@ const gravatar = require("gravatar");
 const { SECRET } = process.env;
 const { HttpError } = require("../helpers");
 const path = require("path");
+const resizer = require("../helpers/resizer");
 const fs = require("fs").promises;
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 // --REGISTER--
@@ -73,8 +74,10 @@ const updateSubscriptionUser = async (id, { subscription }) => {
 };
 // --UPDATE USER AVATAR--
 const updateAvatarUser = async (id, { path: tempUpload, originalname }) => {
+  await resizer(tempUpload);
   const filename = `${id}_${originalname}`;
   const resultUpload = path.join(avatarsDir, filename);
+  //
   await fs.rename(tempUpload, resultUpload);
   const avatarURL = path.join("avatars", filename);
   await User.findByIdAndUpdate(id, { avatarURL });
