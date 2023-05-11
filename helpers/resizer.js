@@ -1,11 +1,12 @@
-const jimp = require("jimp");
-
+const Jimp = require("jimp");
+// console.log(Jimp.read());
 const resizer = async (path) => {
   try {
-    const image = await jimp.read(path);
+    console.log(path)
+    const image = await Jimp.read(path);
     await image.contain(250, 250);
     await image.resize(250, 250);
-    await jimp.writeAsync(path);
+    await image.writeAsync(path);
   } catch (e) {
     console.error(e);
   }

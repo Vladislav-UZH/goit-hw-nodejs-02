@@ -75,6 +75,7 @@ const updateSubscriptionUser = async (id, { subscription }) => {
 // --UPDATE USER AVATAR--
 const updateAvatarUser = async (id, { path: tempUpload, originalname }) => {
   try {
+    console.log(tempUpload);
     await resizer(tempUpload);
     const filename = `${id}_${originalname}`;
     const resultUpload = path.join(avatarsDir, filename);
