@@ -5,6 +5,7 @@ const {
   logoutUser,
   currentUser,
   updateSubscriptionUser,
+  updateAvatarUser,
 } = require("../service/users");
 //
 const register = async (req, res) => {
@@ -34,4 +35,18 @@ const updateSubscription = async (req, res) => {
   const updatedUser = await updateSubscriptionUser(id, req.body);
   res.status(200).json(updatedUser);
 };
-module.exports = { register, current, logout, login, updateSubscription };
+const updateAvatar = async (req, res) => {
+  const { id } = req.user;
+  const file = req.file;
+  const avatarURL = await updateAvatarUser(id, file);
+  res.status(200).json({ avatarURL });
+};
+//
+module.exports = {
+  register,
+  current,
+  logout,
+  login,
+  updateSubscription,
+  updateAvatar,
+};

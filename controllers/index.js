@@ -13,6 +13,7 @@ const {
   logout,
   login,
   updateSubscription,
+  updateAvatar,
 } = require("./users");
 //
 const ctrl = {
@@ -29,5 +30,6 @@ const ctrl = {
   current: ctrlWrapper(current),
   login: ctrlWrapper(login),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
 module.exports = ctrl;

@@ -1,8 +1,31 @@
 const User = require("../db/models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 const { SECRET } = process.env;
 const { HttpError } = require("../helpers");
+const path = require("path");
+const resizer = require("../helpers/resizer");
+const fs = require("fs").promises;
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+// --REGISTER--
+const registerUser = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (user) {
+    throw HttpError(409, "Email in use");
+  }
+  // default avatar image
+  const avatarURL = gravatar.url(email);
+  //   password hashing
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await User.create({
+    email,
+    password: hashedPassword,
+    avatarURL,
+  });
+
+  return { email, subscription: newUser.subscription };
+};
 //  --LOGIN--
 const loginUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
@@ -22,21 +45,6 @@ const loginUser = async ({ email, password }) => {
   user.token = token;
   await user.save();
   return { email, subscription: user.subscription, token };
-};
-// --REGISTER--
-const registerUser = async ({ email, password }) => {
-  const user = await User.findOne({ email });
-  if (user) {
-    throw HttpError(409, "Email in use");
-  }
-  //   password hashing
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({
-    email,
-    password: hashedPassword,
-  });
-
-  return { email, subscription: newUser.subscription };
 };
 // --GET CURRENT--
 const currentUser = async (id) => {
@@ -64,11 +72,27 @@ const updateSubscriptionUser = async (id, { subscription }) => {
   await user.save();
   return { email, subscription };
 };
-
+// --UPDATE USER AVATAR--
+const updateAvatarUser = async (id, { path: tempUpload, originalname }) => {
+  try {
+    console.log(tempUpload);
+    await resizer(tempUpload);
+    const filename = `${id}_${originalname}`;
+    const resultUpload = path.join(avatarsDir, filename);
+    //
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("avatars", filename);
+    await User.findByIdAndUpdate(id, { avatarURL });
+    return avatarURL;
+  } catch (error) {
+    await fs.unlink(tempUpload);
+  }
+};
 module.exports = {
   loginUser,
   registerUser,
   logoutUser,
   currentUser,
   updateSubscriptionUser,
+  updateAvatarUser,
 };
