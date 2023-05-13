@@ -143,8 +143,10 @@ const resendEmailToVerifyUser = async ({ email }) => {
         background-color: aliceblue;
         border: rgb(0, 134, 243) solid 1px;
       }
-      .myLink:hover {
+      .myLink {
         font-size: 22px;
+      }
+      .myLink:hover {
         color: rgb(0, 125, 228);
       }
     </style>
