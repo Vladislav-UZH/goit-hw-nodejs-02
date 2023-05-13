@@ -1,2 +1,4 @@
 const HttpError = require("./HttpError");
-module.exports = { HttpError };
+const sendgridService = require("./sendgridService");
+
+module.exports = { HttpError, sendgridService };
