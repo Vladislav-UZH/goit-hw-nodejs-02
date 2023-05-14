@@ -33,7 +33,10 @@ const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
 });
-
+//
+const verifyEmailSchema = Joi.object({
+  email: Joi.string().email().required(),
+}).unknown(false);
 const contactsSchemas = {
   addingSchema,
   updatingSchema,
@@ -43,6 +46,7 @@ const userSchemas = {
   loginSchema,
   registerSchema,
   updatingSubscriptionSchema,
+  verifyEmailSchema,
 };
 module.exports = {
   contactsSchemas,

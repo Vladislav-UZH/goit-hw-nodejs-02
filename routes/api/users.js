@@ -30,5 +30,15 @@ router.patch(
   upload.single("avatar"),
   ctrl.updateAvatar
 );
+router.get("/verify/:verificationToken", ctrl.verify);
+router.post(
+  "/verify",
+  validateBody(
+    userSchemas.verifyEmailSchema,
+    400,
+    "missing required field email"
+  ),
+  ctrl.resendEmailToVerify
+);
 
 module.exports = router;

@@ -6,6 +6,8 @@ const {
   currentUser,
   updateSubscriptionUser,
   updateAvatarUser,
+  verifyUser,
+  resendEmailToVerifyUser,
 } = require("../service/users");
 //
 const register = async (req, res) => {
@@ -35,6 +37,7 @@ const updateSubscription = async (req, res) => {
   const updatedUser = await updateSubscriptionUser(id, req.body);
   res.status(200).json(updatedUser);
 };
+//
 const updateAvatar = async (req, res) => {
   const { id } = req.user;
   const file = req.file;
@@ -42,6 +45,20 @@ const updateAvatar = async (req, res) => {
   res.status(200).json({ avatarURL });
 };
 //
+const verify = async (req, res) => {
+  const { verificationToken } = req.params;
+  await verifyUser(verificationToken);
+  res.status(200).json({ message: "Verification successful!" });
+};
+//
+const resendEmailToVerify = async (req, res) => {
+  await resendEmailToVerifyUser(req.body);
+  res.status(200).json({
+    message: "Verification email sent",
+  });
+};
+//
+
 module.exports = {
   register,
   current,
@@ -49,4 +66,6 @@ module.exports = {
   login,
   updateSubscription,
   updateAvatar,
+  verify,
+  resendEmailToVerify,
 };

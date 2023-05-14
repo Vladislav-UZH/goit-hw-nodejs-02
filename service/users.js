@@ -2,14 +2,16 @@ const User = require("../db/models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
-const { SECRET } = process.env;
-const { HttpError } = require("../helpers");
+const { nanoid } = require("nanoid");
+const { SECRET, BASE_URL } = process.env;
+const { HttpError, sendgridService } = require("../helpers");
 const path = require("path");
 const resizer = require("../helpers/resizer");
 const fs = require("fs").promises;
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 // --REGISTER--
 const registerUser = async ({ email, password }) => {
+  const verificationToken = nanoid();
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
@@ -22,8 +24,15 @@ const registerUser = async ({ email, password }) => {
     email,
     password: hashedPassword,
     avatarURL,
+    verificationToken,
   });
-
+  const sendBody = {
+    to: email,
+    from: { email: "velganvika@gmail.com" },
+    subject: "Account verification",
+    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+  };
+  await sendgridService.sendToEmail(sendBody);
   return { email, subscription: newUser.subscription };
 };
 //  --LOGIN--
@@ -32,10 +41,17 @@ const loginUser = async ({ email, password }) => {
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
   }
+  if (!user.verify) {
+    throw HttpError(
+      401,
+      "Unverified email! Please, check your email to verify your account and try again."
+    );
+  }
   const comparedPassword = await bcrypt.compare(password, user.password);
   if (!comparedPassword) {
     throw HttpError(401, "Email or password is wrong");
   }
+
   // token creation
   const time = { expiresIn: "23h" };
   const payload = {
@@ -43,6 +59,7 @@ const loginUser = async ({ email, password }) => {
   };
   const token = jwt.sign(payload, SECRET, time);
   user.token = token;
+  user.verificationToken = "";
   await user.save();
   return { email, subscription: user.subscription, token };
 };
@@ -88,6 +105,62 @@ const updateAvatarUser = async (id, { path: tempUpload, originalname }) => {
     await fs.unlink(tempUpload);
   }
 };
+// --VERIFY USER--
+const verifyUser = async (verificationToken) => {
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verificationToken: null,
+    verify: true,
+  });
+};
+// --RESEND EMAIL TO VERIFY USER--
+const resendEmailToVerifyUser = async ({ email }) => {
+  console.log(email);
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw HttpError(404, "Email not found");
+  }
+  if (user.verify) {
+    throw HttpError(400, "Verification has already been passed");
+  }
+  const sendBody = {
+    to: email,
+    from: { email: "velganvika@gmail.com" },
+    subject: "Account verification",
+    html: `
+    <!DOCTYPE html>
+    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+      .container {
+        padding: 30px;
+        background-color: aliceblue;
+        border: rgb(0, 134, 243) solid 1px;
+      }
+      .myLink {
+        font-size: 22px;
+      }
+      .myLink:hover {
+        color: rgb(0, 125, 228);
+      }
+    </style>
+    </head>
+<body>
+<div class="container">
+    <a class="myLink" target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">Click verify email</a>
+</div></body>
+</html>
+    `,
+  };
+
+  await sendgridService.sendToEmail(sendBody);
+};
 module.exports = {
   loginUser,
   registerUser,
@@ -95,4 +168,6 @@ module.exports = {
   currentUser,
   updateSubscriptionUser,
   updateAvatarUser,
+  verifyUser,
+  resendEmailToVerifyUser,
 };
